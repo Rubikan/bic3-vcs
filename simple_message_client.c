@@ -11,3 +11,11 @@
  *
  */
 
+#include <stdlib.h>
+
+#define SERVERPORT 5000+1819
+
+int main(int argc, char* argv[]) {
+    return EXIT_SUCCESS;
+}
+
