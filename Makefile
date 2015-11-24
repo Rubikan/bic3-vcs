@@ -1,5 +1,5 @@
 CC 		= gcc
-CFLAGS  = -Wall -Werror -Wextra -Wstrict-prototypes -pedantic -fno-common -g -O3
+CFLAGS  = -Wall -Werror -Wextra -Wstrict-prototypes -pedantic -fno-common -g -O3 -std=gnu11
 DOXYGEN = doxygen
 SRCDIR  = src
 OBJDIR  = obj
@@ -13,11 +13,11 @@ default: all
 
 client: simple_message_client.c
 	$(CC) $(CFLAGS) -c simple_message_client.c -o simple_message_client.o
-	$(CC) simple_message_client.o -o client
+	$(CC) simple_message_client.o -o client -lsimple_message_client_commandline_handling
 
 server: simple_message_server.c
 	$(CC) $(CFLAGS) -c simple_message_server.c -o simple_message_server.o
-	$(CC) simple_message_server.o -o server
+	$(CC) simple_message_server.o -o server -lsimple_message_client_commandline_handling
 
 all: client server
 
