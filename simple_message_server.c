@@ -31,14 +31,14 @@ int main(int argc, char* argv[]) {
     struct sockaddr_in clientSocketAdress;
     unsigned short int port;
 
-    if (argc > 2) {
+    if (argc > 3) {
         usage();
         return EXIT_FAILURE;
     }
 
-    int opt;
-    while ((opt = getopt(argc, argv, "p:")) != -1) {
-        switch(opt) {
+    int o;
+    while ((o = getopt(argc, argv, "p:")) != -1) {
+        switch(o) {
             case 'p':
                 errno = 0;
                 port = atoi(optarg);
