@@ -17,7 +17,7 @@ client: simple_message_client.c
 
 server: simple_message_server.c
 	$(CC) $(CFLAGS) -c simple_message_server.c -o simple_message_server.o
-	$(CC) simple_message_server.o -o server -lsimple_message_client_commandline_handling
+	$(CC) simple_message_server.o -o server
 
 all: client server
 

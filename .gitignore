@@ -2,6 +2,10 @@
 *.iml
 .idea/
 
+# Project specific stuff
+server
+client
+
 # Object files
 *.o
 *.ko
