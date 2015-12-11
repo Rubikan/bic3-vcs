@@ -20,9 +20,7 @@
 
 #define DEFAULT_PORT 5000+1819
 
-void usage() {
-    perror("Usage: simple_message_server [-p port]\\n");
-}
+void usage(void);
 
 int main(int argc, char* argv[]) {
     int serverSocketID;
@@ -79,11 +77,28 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    printf("TEST: %d", port);
+    printf("TEST: %d\n", port);
 
+	// read 256 bytes that the client send 
+	// need to check the last bit if more is comming
+	// ka was für ein zeichen das dann wird
+    char buffer[256];
+	int n;
+	n = read(connectedClient,buffer,255);
+    if (n < 0){ 
+		perror("ERROR reading from socket");
+        return EXIT_FAILURE;
+	}
+    
+	printf("Here is the message: %s\n",buffer);
+	
     // Business Logic
 
     close(serverSocketID);
 
     return EXIT_SUCCESS;
+}
+
+void usage() {
+    perror("Usage: simple_message_server [-p port]\\n");
 }
