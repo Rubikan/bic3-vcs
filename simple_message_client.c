@@ -3,7 +3,7 @@
  * ./client -s localhost -p 6819 -u ic14b070 -m Hallo
  * simple_message_server -p 6819
  * nc localhost 6819
- *
+ *6795
  * @file simple_message_client.c
  * Simple Message Client
  *
@@ -32,6 +32,7 @@
 
 void usage(FILE *stream, const char *cmnd, int exitcode);
 void error(char *msg);
+char * makeSendMessage(const char *user,const char *message,const char *img_url);
 
 
 //http://stackoverflow.com/questions/14562845/why-does-passing-char-as-const-char-generate-a-warning
@@ -59,11 +60,13 @@ int main(int argc, const char * const argv[]) {
     const char *port="6783";
 	const char *user="ic14b070";
     const char *message="Hallo Welt!";
-    const char *img_url=" ";
+    const char *img_url="";
     int verbose=-1;
 	void (* smc_usagefunc_t) (FILE *, const char *, int);
 	smc_usagefunc_t=&usage;
     struct sockaddr_in serveraddr;
+	
+	char *sendMessage="";
 	
 	struct hostent *serverHostent;
 	
@@ -86,6 +89,7 @@ int main(int argc, const char * const argv[]) {
 	smc_parsecommandline(argc,argv,smc_usagefunc_t,&server,&port,&user,&message,&img_url,&verbose);
 	
 	printf("%s\n",port);
+	
 	
 	 
 	//servinfo->ai_family= AF_INET;  
@@ -135,10 +139,17 @@ int main(int argc, const char * const argv[]) {
 
 	printf("Vor Write\n");
 	printf("Message: %s\n",message);
-    /* send the message line to the server */
-    n = write(sockfd, message, strlen(message));
-    if (n < 0) 
-      error("ERROR writing to socket");
+	
+	sendMessage = makeSendMessage(user,message,img_url);
+	
+	printf("whole Message: %s\n",sendMessage);
+	
+	if(strlen(sendMessage)<256){
+		/* send the message line to the server */
+		n = write(sockfd, sendMessage, strlen(sendMessage));
+		if (n < 0) 
+			error("ERROR writing to socket");
+	}
 
     /* print the server's reply */
     /*bzero(buf, BUFSIZE);
@@ -147,6 +158,8 @@ int main(int argc, const char * const argv[]) {
       error("ERROR reading from socket");
     printf("Echo from server: %s", buf);
     close(sockfd);*/
+	
+	free(sendMessage);
 	
 	printf("erfolgereich mit Server kommuniziert.\n");
 	
@@ -163,4 +176,36 @@ void error(char *msg)
 {
     perror(msg);
     exit(1);
+}
+
+char * makeSendMessage(const char *user,const char *message,const char *img_url){
+	printf("Start\n");
+	//char * str3 = (char *) malloc(1 + strlen(str1)+ strlen(str2) );
+	printf("user: %d\n",strlen(user));
+	printf("message: %d\n",strlen(message));
+	if(img_url != NULL){
+		printf("img_url: %d\n",strlen(img_url));
+	} else {
+		printf("img_url is NULL\n");
+	}
+	int len = 1 + 5 + strlen(user) + 1 + strlen(message) + (img_url != NULL ? 1 + 4 + strlen(img_url) : 0);
+	printf("len: %d\n",len);
+	char *sendMessage = (char *) malloc(len);
+	printf("sendMessage: %s\n",sendMessage);
+	strcpy(sendMessage, "user=");
+	strcat(sendMessage, user);
+	//sendMessage+="user="
+	//sendMessage+=user;
+	if(img_url != NULL){
+		strcat(sendMessage, "\x0a");
+		strcat(sendMessage, "img=");
+		strcat(sendMessage, img_url);
+		//sendMessage+="\x0a"+"img="+img_url;
+	}
+	strcat(sendMessage, "\x0a");
+	strcat(sendMessage, message);
+	//sendMessage+="\x0a"+message;
+	
+	printf("sendMessage: %s\n",sendMessage);
+	return sendMessage;
 }

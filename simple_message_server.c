@@ -21,6 +21,7 @@
 #define DEFAULT_PORT 5000+1819
 
 void usage(void);
+void splitMessage(char charArr[]);
 
 int main(int argc, char* argv[]) {
     int serverSocketID;
@@ -82,7 +83,7 @@ int main(int argc, char* argv[]) {
 	// read 256 bytes that the client send 
 	// need to check the last bit if more is comming
 	// ka was für ein zeichen das dann wird
-    char buffer[256];
+    char buffer[256]= {'\0'};
 	int n;
 	n = read(connectedClient,buffer,255);
     if (n < 0){ 
@@ -92,6 +93,7 @@ int main(int argc, char* argv[]) {
     
 	printf("Here is the message: %s\n",buffer);
 	
+	splitMessage(buffer);
     // Business Logic
 
     close(serverSocketID);
@@ -101,4 +103,28 @@ int main(int argc, char* argv[]) {
 
 void usage() {
     perror("Usage: simple_message_server [-p port]\\n");
+}
+
+void splitMessage(char charArr[]){
+	char userPartOfMessage[256]= {'\0'};
+	char restPartOfMessage[256]= {'a','b','c','\0'};
+	int i=0; 
+	int count=0;
+	int lenUser=1;
+	for(i=0;charArr[i]!='\0';i++){
+		char c = charArr[i];
+		if(c != 0x0a){
+			if(count == 0){					
+				userPartOfMessage[i]=c;
+				lenUser++;
+			} else {
+				restPartOfMessage[i-lenUser]=c;
+			}
+		} else {
+			printf("Trennzeichen gefunden JUHU!!!!\n");
+			count++;
+		}
+	}
+	printf("User: %s\n", userPartOfMessage);
+	printf("Rest: %s\n", restPartOfMessage);
 }
