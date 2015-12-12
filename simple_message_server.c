@@ -94,6 +94,7 @@ int main(int argc, char* argv[]) {
 	printf("Here is the message: %s\n",buffer);
 	
 	splitMessage(buffer);
+	
     // Business Logic
 
     close(serverSocketID);
@@ -113,7 +114,7 @@ void splitMessage(char charArr[]){
 	int lenUser=1;
 	for(i=0;charArr[i]!='\0';i++){
 		char c = charArr[i];
-		if(c != 0x0a){
+		if(c != 0x0a || (c == 0x0a && charArr[i+1] == 0x0d)){
 			if(count == 0){					
 				userPartOfMessage[i]=c;
 				lenUser++;
@@ -122,6 +123,7 @@ void splitMessage(char charArr[]){
 			}
 		} else {
 			printf("Trennzeichen gefunden JUHU!!!!\n");
+			printf("next char: %c\n",charArr[i+1]);
 			count++;
 		}
 	}

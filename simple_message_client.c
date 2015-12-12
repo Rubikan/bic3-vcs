@@ -32,6 +32,7 @@
 
 void usage(FILE *stream, const char *cmnd, int exitcode);
 void error(char *msg);
+void writeToServer(int sockfd, char * sendMessage, int messageLen);
 char * makeSendMessage(const char *user,const char *message,const char *img_url);
 
 
@@ -42,7 +43,7 @@ int main(int argc, const char * const argv[]) {
 	//http://stackoverflow.com/questions/840501/how-do-function-pointers-in-c-work
 	/*void (* smc_usagefunc_t) (FILE *, const char *, int);
 	smc_usagefunc_t = &usage;*/
-	int sockfd,n;
+	int sockfd;
 	//char buf[BUFSIZE];
 	/*
 	struct sockaddr_in {
@@ -143,14 +144,23 @@ int main(int argc, const char * const argv[]) {
 	sendMessage = makeSendMessage(user,message,img_url);
 	
 	printf("whole Message: %s\n",sendMessage);
-	
-	if(strlen(sendMessage)<256){
-		/* send the message line to the server */
-		n = write(sockfd, sendMessage, strlen(sendMessage));
-		if (n < 0) 
-			error("ERROR writing to socket");
+	int messLen = strlen(sendMessage);
+	if(messLen<256){
+		writeToServer(sockfd, sendMessage, strlen(sendMessage));
+	} else {
+		//int anzAnWrites = (int) ((messLen / 255)+0.5);
+		int lenArlreadySend = 0;
+		char *partMessage= (char *) malloc(255);
+		while(lenArlreadySend < messLen){
+			strncpy(partMessage,sendMessage+lenArlreadySend,254);
+			writeToServer(sockfd, partMessage, strlen(partMessage));
+			
+		}
 	}
 
+	if(shutdown(sockfd,2)<0){
+		error("ERROR closing Socket");
+	}
     /* print the server's reply */
     /*bzero(buf, BUFSIZE);
     n = read(sockfd, buf, BUFSIZE);
@@ -176,6 +186,14 @@ void error(char *msg)
 {
     perror(msg);
     exit(1);
+}
+
+void writeToServer(int sockfd, char * sendMessage, int messageLen){
+		/* send the message line to the server */
+	int n = write(sockfd, sendMessage, messageLen);
+	if (n < 0) {
+		error("ERROR writing to socket");
+	}
 }
 
 char * makeSendMessage(const char *user,const char *message,const char *img_url){
