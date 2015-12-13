@@ -24,6 +24,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h> 
+#include <unistd.h>
 
 #include <simple_message_client_commandline_handling.h>
 
@@ -145,18 +146,30 @@ int main(int argc, const char * const argv[]) {
 	
 	printf("whole Message: %s\n",sendMessage);
 	int messLen = strlen(sendMessage);
-	if(messLen<256){
-		writeToServer(sockfd, sendMessage, strlen(sendMessage));
-	} else {
+	//if(messLen<256){
+	//	writeToServer(sockfd, sendMessage, strlen(sendMessage));
+	//} else {
 		//int anzAnWrites = (int) ((messLen / 255)+0.5);
 		int lenArlreadySend = 0;
 		char *partMessage= (char *) malloc(255);
-		while(lenArlreadySend < messLen){
+		int first=1;
+		do{
 			strncpy(partMessage,sendMessage+lenArlreadySend,254);
 			writeToServer(sockfd, partMessage, strlen(partMessage));
-			
-		}
-	}
+			while(!first && buffer[0] == 0x12){
+				//waitForServer()
+				char buffer[2]= {'\0'};
+				int n;
+				n = read(connectedClient,buffer,2);
+				if (n < 0){ 
+					perror("ERROR reading from socket");
+					return EXIT_FAILURE;
+				}
+				nanosleep(1000000);
+			}
+			first=0;
+		}while(lenArlreadySend < messLen)
+	//}
 
 	if(shutdown(sockfd,2)<0){
 		error("ERROR closing Socket");
