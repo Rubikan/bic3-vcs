@@ -161,7 +161,7 @@ int main(int argc, const char * const argv[]) {
 			printf("lenArlreadySend(%d) < messLen(%d): %d\n",lenArlreadySend,messLen,lenArlreadySend < messLen);
 			c++;
 			writeToServer(sockfd, partMessage, strlen(partMessage));
-			lenArlreadySend=254;
+			lenArlreadySend+=254;
 			while(!first && buffer[0] == 0x12){
 				//waitForServer()
 				int n;
