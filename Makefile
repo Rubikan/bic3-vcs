@@ -1,4 +1,4 @@
-CC 		= gcc
+CC 		= gcc52
 CFLAGS  = -Wall -Werror -Wextra -Wstrict-prototypes -pedantic -fno-common -g -O3 -std=gnu11
 DOXYGEN = doxygen
 SRCDIR  = src
