@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
     int connectedClient;
     struct sockaddr_in serverSocketAdress;
     struct sockaddr_in clientSocketAdress;
-    unsigned short int port;
+    int port;
 
     if (argc > 3) {
         usage();
@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
             case 'p':
                 errno = 0;
                 port = atoi(optarg);
-                if (port > MAX_PORT) {
+                if (port < MIN_PORT || port > MAX_PORT) {
                     fprintf(stderr, "The port has to be in the range 0..65535!");
                     return EXIT_FAILURE;
                 }
