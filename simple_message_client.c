@@ -154,9 +154,14 @@ int main(int argc, const char * const argv[]) {
 		char *partMessage= (char *) malloc(255);
 		int first=1;
 		char buffer[2]= {'\0'};
+		int c=1;
 		do{
 			strncpy(partMessage,sendMessage+lenArlreadySend,254);
+			printf("%d.Write\n",c);
+			printf("lenArlreadySend(%d) < messLen(%d): %d\n",lenArlreadySend,messLen,lenArlreadySend < messLen);
+			c++;
 			writeToServer(sockfd, partMessage, strlen(partMessage));
+			lenArlreadySend=254;
 			while(!first && buffer[0] == 0x12){
 				//waitForServer()
 				int n;
@@ -198,7 +203,7 @@ int main(int argc, const char * const argv[]) {
 // getLine um line vom Socket zu bekommen ... speicher frei geben
 
 void usage(FILE *stream, const char *cmnd, int exitcode){
-	printf("ALLES KAPUTT: %d%d%d",stream->_flags,*cmnd,exitcode);
+	printf("Usage: simple_message_client  -s server -p port -u user [-i image URL] -m message [-v] [-h]\n Error: %d%d%d",stream->_flags,*cmnd,exitcode);
 }
 
 void error(char *msg)
