@@ -143,6 +143,5 @@ char * makeSendMessage(const char *user,const char *message,const char *img_url)
 	strcat(sendMessage, "\x0a");
 	strcat(sendMessage, message);
 	
-	free(sendMessage);
 	return sendMessage;
 }
