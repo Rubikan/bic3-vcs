@@ -43,10 +43,10 @@ int main(int argc, char* argv[]) {
         switch(o) {
             case 'p':
                 errno = 0;
+                port = atoi(optarg);
                 if (port < MIN_PORT || port > MAX_PORT) {
                     fprintf(stderr, "The port has to be in the range 0..65535!");
                 }
-                port = atoi(optarg);
                 break;
             case 'h':
                 errno = 0;
