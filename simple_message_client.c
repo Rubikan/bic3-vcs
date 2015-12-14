@@ -25,6 +25,7 @@
 #include <netinet/in.h>
 #include <netdb.h> 
 #include <unistd.h>
+#include <time.h>
 
 #include <simple_message_client_commandline_handling.h>
 
@@ -102,8 +103,7 @@ int main(int argc, const char * const argv[]) {
 	
 	serverHostent = gethostbyname(server);
     if (serverHostent == NULL) {
-        fprintf(stderr,"ERROR, no such host\n");
-        exit(0);
+        error("ERROR, no such host\n");
     }
 	
 	
@@ -153,22 +153,28 @@ int main(int argc, const char * const argv[]) {
 		int lenArlreadySend = 0;
 		char *partMessage= (char *) malloc(255);
 		int first=1;
+		char buffer[2]= {'\0'};
 		do{
 			strncpy(partMessage,sendMessage+lenArlreadySend,254);
 			writeToServer(sockfd, partMessage, strlen(partMessage));
 			while(!first && buffer[0] == 0x12){
 				//waitForServer()
-				char buffer[2]= {'\0'};
 				int n;
-				n = read(connectedClient,buffer,2);
+				n = read(sockfd,buffer,2);
 				if (n < 0){ 
-					perror("ERROR reading from socket");
-					return EXIT_FAILURE;
+					error("ERROR reading from socket");
 				}
-				nanosleep(1000000);
+				struct timespec *req;
+				struct timespec *rem;
+				bzero((char *) &req, sizeof(req));
+				req->tv_sec = (1 / 1000);
+				req->tv_nsec = ((1 % 1000) * 1000000);
+				if(nanosleep(req,rem)){
+					error("ERROR waiting");
+				}
 			}
 			first=0;
-		}while(lenArlreadySend < messLen)
+		}while(lenArlreadySend < messLen);
 	//}
 
 	if(shutdown(sockfd,2)<0){
