@@ -20,6 +20,8 @@
 #include <sys/socket.h>
 
 #define DEFAULT_PORT 5000+1819
+#define MAX_PORT 65535
+#define MIN_PORT 0
 
 void usage(void);
 void splitMessage(char charArr[]);
@@ -41,9 +43,13 @@ int main(int argc, char* argv[]) {
         switch(o) {
             case 'p':
                 errno = 0;
+                if (port > MIN_PORT || port > MAX_PORT) {
+                    fprintf(stderr, "The port has to be in the range 0..65535!");dded check for p
+                }
                 port = atoi(optarg);
                 break;
             case 'h':
+                errno = 0;
                 usage();
                 break;
             default:
