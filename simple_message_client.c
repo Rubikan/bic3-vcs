@@ -113,7 +113,11 @@ int main(int argc, const char * const argv[]) {
 
 
 void usage(FILE *stream, const char *cmnd, int exitcode){
-	printf("Usage: simple_message_client  -s server -p port -u user [-i image URL] -m message [-v] [-h]\n Error: %d%d%d",stream->_flags,*cmnd,exitcode);
+	//",stream->_flags,*cmnd,exitcode	
+	if (printf ("Error: %d; %d; %d\n", stream->_flags,*cmnd,exitcode) < 0){
+		error("ERROR at writing Error.");
+	}
+	error("Usage: simple_message_client  -s server -p port -u user [-i image URL] -m message [-v] [-h]");
 }
 
 void error(char *msg)
