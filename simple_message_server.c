@@ -10,7 +10,7 @@
  * @date 2015/11/18
  *
  */
-leanup
+
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
