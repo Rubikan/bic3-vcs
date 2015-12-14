@@ -80,7 +80,6 @@ int main(int argc, const char * const argv[]) {
 	char *partMessage= (char *) malloc(255);
 	int first=1;
 	char buffer[2]= {'\0'};
-	int c=1;
 	do{
 		strncpy(partMessage,sendMessage+lenArlreadySend,254);
 		writeToServer(sockfd, partMessage, strlen(partMessage));
