@@ -105,11 +105,6 @@ int main(int argc, const char * const argv[]) {
 	if(shutdown(sockfd,2)<0){
 		error("ERROR closing Socket");
 	}
-	
-	free(sendMessage);
-		
-	
-	
     return EXIT_SUCCESS;
 }
 

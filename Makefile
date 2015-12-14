@@ -13,11 +13,11 @@ default: all
 
 client: simple_message_client.c
 	$(CC) $(CFLAGS) -c simple_message_client.c -o simple_message_client.o
-	$(CC) simple_message_client.o -o client -lsimple_message_client_commandline_handling
+	$(CC) simple_message_client.o -o simple_message_client -lsimple_message_client_commandline_handling
 
 server: simple_message_server.c
 	$(CC) $(CFLAGS) -c simple_message_server.c -o simple_message_server.o
-	$(CC) simple_message_server.o -o server
+	$(CC) simple_message_server.o -o simple_message_server
 
 all: client server
 

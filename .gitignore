@@ -3,8 +3,8 @@
 .idea/
 
 # Project specific stuff
-server
-client
+simple_message_server
+simple_message_client
 
 # Object files
 *.o
