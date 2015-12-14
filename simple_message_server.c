@@ -10,7 +10,7 @@
  * @date 2015/11/18
  *
  */
-
+leanup
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
@@ -59,11 +59,11 @@ int main(int argc, char* argv[]) {
 
     serverSocketID = socket(AF_INET, SOCK_STREAM, 0);
 
-    // Adressen vom Internet
+    // Internet addresses
     serverSocketAdress.sin_family = AF_INET;
-    // Es werden Verbindungen von allen Adressen akzeptiert
+    // Accept connections from all adresses
     serverSocketAdress.sin_addr.s_addr = INADDR_ANY;
-    // Serverport festlegen
+    // Define serverport
     serverSocketAdress.sin_port = htons(port);
 
     if (bind(serverSocketID, (struct sockaddr*)&serverSocketAdress, sizeof(serverSocketAdress)) < 0) {
@@ -76,6 +76,7 @@ int main(int argc, char* argv[]) {
     }
 
     for(;;) {
+        // Accept a connection on the server port
         int c = sizeof(struct sockaddr_in);
         connectedClient = accept(serverSocketID, (struct sockaddr*)&clientSocketAdress, (socklen_t*)&c);
         if (connectedClient < 0) {
@@ -88,23 +89,7 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        /*printf("TEST: %d\n", port);
-
-        // read 256 bytes that the client send
-        // need to check the last bit if more is comming
-        // ka was für ein zeichen das dann wird
-        char buffer[256]= {'\0'};
-        int n;
-        n = read(connectedClient,buffer,255);
-        if (n < 0){
-            perror("ERROR reading from socket");
-            return EXIT_FAILURE;
-        }
-
-        printf("Here is the message: %s\n",buffer);
-
-        splitMessage(buffer);*/
-
+        // Spawning server for business logic
         int child = fork();
         if (child == -1) {
             // Fork Failed
@@ -132,7 +117,6 @@ int main(int argc, char* argv[]) {
                 fprintf(stderr, "Error executing business logic!\n%s", strerror(errno));
             }
         }
-
         close(connectedClient);
     }
 
@@ -142,28 +126,3 @@ int main(int argc, char* argv[]) {
 void usage() {
     perror("Usage: simple_message_server [-p port]\\n");
 }
-
-/*void splitMessage(char charArr[]){
-	char userPartOfMessage[256]= {'\0'};
-	char restPartOfMessage[256]= {'a','b','c','\0'};
-	int i=0; 
-	int count=0;
-	int lenUser=1;
-	for(i=0;charArr[i]!='\0';i++){
-		char c = charArr[i];
-		if(c != 0x0a || (c == 0x0a && charArr[i+1] == 0x0d)){
-			if(count == 0){					
-				userPartOfMessage[i]=c;
-				lenUser++;
-			} else {
-				restPartOfMessage[i-lenUser]=c;
-			}
-		} else {
-			printf("Trennzeichen gefunden JUHU!!!!\n");
-			printf("next char: %c\n",charArr[i+1]);
-			count++;
-		}
-	}
-	printf("User: %s\n", userPartOfMessage);
-	printf("Rest: %s\n", restPartOfMessage);
-}*/
