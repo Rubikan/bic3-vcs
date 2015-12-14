@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 #include <errno.h>
+#include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <arpa/inet.h>
@@ -36,11 +37,14 @@ int main(int argc, char* argv[]) {
     }
 
     int o;
-    while ((o = getopt(argc, argv, "p:")) != -1) {
+    while ((o = getopt(argc, argv, "p:h")) != -1) {
         switch(o) {
             case 'p':
                 errno = 0;
                 port = atoi(optarg);
+                break;
+            case 'h':
+                usage();
                 break;
             default:
                 usage();
@@ -63,41 +67,74 @@ int main(int argc, char* argv[]) {
     serverSocketAdress.sin_port = htons(port);
 
     if (bind(serverSocketID, (struct sockaddr*)&serverSocketAdress, sizeof(serverSocketAdress)) < 0) {
-        perror("Error binding socket!");
+        fprintf(stderr, "Error binding socket!\n%s", strerror(errno));
         return EXIT_FAILURE;
     }
     if (listen(serverSocketID, 5) == -1) {
-        perror("Error listening on socket!");
+        fprintf(stderr, "Error listening on socket!\n%s", strerror(errno));
         return EXIT_FAILURE;
     }
 
-    int c = sizeof(struct sockaddr_in);
-    connectedClient = accept(serverSocketID, (struct sockaddr*)&clientSocketAdress, (socklen_t*)&c);
-    if (connectedClient < 0) {
-        perror("Error accepting incoming connection!");
-        return EXIT_FAILURE;
+    for(;;) {
+        int c = sizeof(struct sockaddr_in);
+        connectedClient = accept(serverSocketID, (struct sockaddr*)&clientSocketAdress, (socklen_t*)&c);
+        if (connectedClient < 0) {
+            if (errno == EINTR) {
+                // accept was interrupted, trying again
+                continue;
+            } else {
+                fprintf(stderr, "Error accepting incoming connection!\n%s", strerror(errno));
+                return EXIT_FAILURE;
+            }
+        }
+
+        /*printf("TEST: %d\n", port);
+
+        // read 256 bytes that the client send
+        // need to check the last bit if more is comming
+        // ka was für ein zeichen das dann wird
+        char buffer[256]= {'\0'};
+        int n;
+        n = read(connectedClient,buffer,255);
+        if (n < 0){
+            perror("ERROR reading from socket");
+            return EXIT_FAILURE;
+        }
+
+        printf("Here is the message: %s\n",buffer);
+
+        splitMessage(buffer);*/
+
+        int child = fork();
+        if (child == -1) {
+            // Fork Failed
+            close(serverSocketID);
+            close(connectedClient);
+            fprintf(stderr, "Error executing fork!\n%s", strerror(errno));
+            return EXIT_FAILURE;
+        } else if (child == 0) {
+            // Server socket is not needed anymore
+            close(serverSocketID);
+            // Replace stdin with the new socket descriptor
+            if (dup2(connectedClient, 0) == -1) {
+                fprintf(stderr, "Error redirecting stdin to socket descriptor!\n%s", strerror(errno));
+                close(connectedClient);
+                return EXIT_FAILURE;
+            }
+            // Replace stdout with the new socket descriptor
+            if (dup2(connectedClient, 1) == -1) {
+                fprintf(stderr, "Error redirecting stdout to socket descriptor!\n%s", strerror(errno));
+                close(connectedClient);
+                return EXIT_FAILURE;
+            }
+            // Execute the business logic
+            if (execlp("/usr/local/bin/simple_message_server_logic", "simple_message_server_logic", NULL) == -1) {
+                fprintf(stderr, "Error executing business logic!\n%s", strerror(errno));
+            }
+        }
+
+        close(connectedClient);
     }
-
-    printf("TEST: %d\n", port);
-
-	// read 256 bytes that the client send 
-	// need to check the last bit if more is comming
-	// ka was für ein zeichen das dann wird
-    char buffer[256]= {'\0'};
-	int n;
-	n = read(connectedClient,buffer,255);
-    if (n < 0){ 
-		perror("ERROR reading from socket");
-        return EXIT_FAILURE;
-	}
-    
-	printf("Here is the message: %s\n",buffer);
-	
-	splitMessage(buffer);
-	
-    // Business Logic
-
-    close(serverSocketID);
 
     return EXIT_SUCCESS;
 }
@@ -106,7 +143,7 @@ void usage() {
     perror("Usage: simple_message_server [-p port]\\n");
 }
 
-void splitMessage(char charArr[]){
+/*void splitMessage(char charArr[]){
 	char userPartOfMessage[256]= {'\0'};
 	char restPartOfMessage[256]= {'a','b','c','\0'};
 	int i=0; 
@@ -129,4 +166,4 @@ void splitMessage(char charArr[]){
 	}
 	printf("User: %s\n", userPartOfMessage);
 	printf("Rest: %s\n", restPartOfMessage);
-}
+}*/
