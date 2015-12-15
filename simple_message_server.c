@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
                 errno = 0;
                 port = atoi(optarg);
                 if (port < MIN_PORT || port > MAX_PORT) {
-                    fprintf(stderr, "The port has to be in the range 0..65535!");
+                    fprintf(stderr, "The port has to be in the range 0..65535!\n");
                     return EXIT_FAILURE;
                 }
                 break;
