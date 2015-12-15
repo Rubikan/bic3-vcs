@@ -65,6 +65,10 @@ int main(int argc, char* argv[]) {
     }
 
     serverSocketID = socket(AF_INET, SOCK_STREAM, 0);
+    if (serverSocketID == -1) {
+        fprintf(stderr, "Error creating socket!\n%s", strerror(errno));
+        return EXIT_FAILURE;
+    }
 
     // Internet addresses
     serverSocketAdress.sin_family = AF_INET;
