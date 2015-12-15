@@ -38,3 +38,7 @@ simple_message_client
 
 # Debug files
 *.dSYM/
+
+# Archives
+*.tgz
+*.zip
